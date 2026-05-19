@@ -29,5 +29,5 @@ const DemoPage = dynamic(() => import('./demo/page'), {
 });
 
 export default function DemoSection() {
-  return <DemoPage />;
+  return <div style={{ height: '100%' }}><DemoPage /></div>;
 }

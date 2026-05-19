@@ -544,7 +544,7 @@ export default function DemoPage() {
 
   return (
     <div style={{
-      background: C.bg, color: C.text, height: '100vh',
+      background: C.bg, color: C.text, height: '100%',
       display: 'flex', flexDirection: 'column',
       fontFamily: '"IBM Plex Sans", -apple-system, system-ui, sans-serif',
       overflow: 'hidden',
