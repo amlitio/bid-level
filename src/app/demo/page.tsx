@@ -292,6 +292,14 @@ export default function DemoPage() {
   const [showHints, setShowHints] = useState(true);
   const [viewMode, setViewMode] = useState<'section' | 'xray' | 'solid'>('section');
   const [projectName] = useState('Main Street Clinic — Boca Raton, FL');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const PARSE_STEPS = [
     'Reading IFC schema (4.3)…',
@@ -575,14 +583,17 @@ export default function DemoPage() {
         {phase === 'ready' && (
           <>
             <div style={{ width: 1, height: 24, background: C.border }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-              <FileText size={14} color={C.textDim} />
-              <span style={{ fontSize: 13, color: C.textDim }}>Project</span>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>{projectName}</span>
-              <span className="mono" style={{ fontSize: 10, color: C.success, background: 'rgba(74,222,128,0.1)', padding: '2px 6px', borderRadius: 3, marginLeft: 6 }}>● PARSED</span>
-            </div>
-            <button className="btn" onClick={() => setShowDiff(true)}><GitCompare size={13} /> Compare Revision</button>
-            <button className="btn primary" onClick={exportCSV}><Download size={13} /> Export CSV</button>
+            {!isMobile && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                <FileText size={14} color={C.textDim} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: 13, color: C.textDim, flexShrink: 0 }}>Project</span>
+                <span style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{projectName}</span>
+                <span className="mono" style={{ fontSize: 10, color: C.success, background: 'rgba(74,222,128,0.1)', padding: '2px 6px', borderRadius: 3, marginLeft: 6, flexShrink: 0 }}>● PARSED</span>
+              </div>
+            )}
+            {isMobile && <div style={{ flex: 1 }} />}
+            {!isMobile && <button className="btn" onClick={() => setShowDiff(true)}><GitCompare size={13} /> Compare Revision</button>}
+            <button className="btn primary" onClick={exportCSV}><Download size={13} />{isMobile ? '' : ' Export CSV'}</button>
           </>
         )}
       </header>
@@ -634,18 +645,24 @@ export default function DemoPage() {
       {/* READY */}
       {phase === 'ready' && (
         <>
-          <div style={{ height: 36, background: C.surface, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 28, flexShrink: 0 }}>
+          <div style={{ height: 36, background: C.surface, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 16px', gap: isMobile ? 16 : 28, flexShrink: 0, overflowX: isMobile ? 'auto' : 'visible' }}>
             <Stat label="Elements" value={fmt(stats.totalElems)} unit="meshes" />
             <Stat label="Concrete" value={fmt(stats.concrete)} unit="cy" />
-            <Stat label="Steel framing" value={fmt(stats.steel)} unit="lf" />
-            <Stat label="Floor area" value="8,000" unit="sf" />
+            {!isMobile && <Stat label="Steel framing" value={fmt(stats.steel)} unit="lf" />}
+            {!isMobile && <Stat label="Floor area" value="8,000" unit="sf" />}
             <Stat label="Line items" value={fmt(lineItems.length)} unit="" />
-            <div style={{ flex: 1 }} />
-            <div className="mono" style={{ fontSize: 11, color: C.textMute }}>parsed in <span style={{ color: C.success }}>1.68s</span></div>
+            <div style={{ flex: 1, minWidth: 8 }} />
+            {!isMobile && <div className="mono" style={{ fontSize: 11, color: C.textMute, flexShrink: 0 }}>parsed in <span style={{ color: C.success }}>1.68s</span></div>}
           </div>
 
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-            {/* 3D Viewer */}
+            {/* 3D Viewer — desktop only */}
+            {isMobile ? (
+              <div style={{ borderBottom: `1px solid ${C.border}`, background: 'rgba(255,107,53,0.06)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, fontSize: 12, color: C.textDim }}>
+                <Box size={14} color={C.accent} style={{ flexShrink: 0 }} />
+                <span>Interactive 3D model available on desktop — takeoff schedule below is fully functional.</span>
+              </div>
+            ) : (
             <div style={{ flex: '0 0 58%', position: 'relative', borderRight: `1px solid ${C.border}`, background: C.bg }}>
               <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
 
@@ -695,6 +712,7 @@ export default function DemoPage() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Takeoff panel */}
             <div className="scrollbar" style={{ flex: 1, overflow: 'auto', background: C.surface }}>
@@ -711,9 +729,11 @@ export default function DemoPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 70px 56px 60px 80px 90px', gap: 8, padding: '8px 16px', fontSize: 10, color: C.textMute, fontWeight: 600, letterSpacing: '0.08em', borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 64, zIndex: 4, background: C.surface }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 60px 44px 80px' : '1fr 70px 56px 60px 80px 90px', gap: 8, padding: '8px 16px', fontSize: 10, color: C.textMute, fontWeight: 600, letterSpacing: '0.08em', borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 64, zIndex: 4, background: C.surface }}>
                 <div>ITEM</div><div style={{ textAlign: 'right' }}>NET QTY</div><div>UNIT</div>
-                <div style={{ textAlign: 'right' }}>WASTE %</div><div style={{ textAlign: 'right' }}>$ / UNIT</div><div style={{ textAlign: 'right' }}>EXTENSION</div>
+                {!isMobile && <div style={{ textAlign: 'right' }}>WASTE %</div>}
+                {!isMobile && <div style={{ textAlign: 'right' }}>$ / UNIT</div>}
+                <div style={{ textAlign: 'right' }}>TOTAL</div>
               </div>
 
               {Object.entries(grouped).map(([div, items]) => (
@@ -731,18 +751,18 @@ export default function DemoPage() {
                     const tot = li.qty * (1 + w / 100), ext = tot * p;
                     const isSelected = selectedKey === li.key, isPhantom = li.meshes.length === 0;
                     return (
-                      <div key={li.key} onClick={() => !isPhantom && setSelectedKey(isSelected ? null : li.key)}
-                        style={{ display: 'grid', gridTemplateColumns: '1fr 70px 56px 60px 80px 90px', gap: 8, padding: '8px 16px', alignItems: 'center', borderBottom: `1px solid ${C.surfaceHi}`, cursor: isPhantom ? 'default' : 'pointer', background: isSelected ? 'rgba(255,107,53,0.08)' : 'transparent', borderLeft: isSelected ? `2px solid ${C.accent}` : '2px solid transparent' }}>
+                      <div key={li.key} onClick={() => !isPhantom && !isMobile && setSelectedKey(isSelected ? null : li.key)}
+                        style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 60px 44px 80px' : '1fr 70px 56px 60px 80px 90px', gap: 8, padding: '8px 16px', alignItems: 'center', borderBottom: `1px solid ${C.surfaceHi}`, cursor: (isPhantom || isMobile) ? 'default' : 'pointer', background: isSelected ? 'rgba(255,107,53,0.08)' : 'transparent', borderLeft: isSelected ? `2px solid ${C.accent}` : '2px solid transparent' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                           <span style={{ fontSize: 12, color: isSelected ? C.accent : C.text, fontWeight: isSelected ? 500 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{li.item}</span>
-                          {isPhantom && <span className="mono" style={{ fontSize: 8, color: C.textMute, padding: '1px 4px', border: `1px solid ${C.border}`, borderRadius: 2 }}>NO 3D</span>}
+                          {isPhantom && !isMobile && <span className="mono" style={{ fontSize: 8, color: C.textMute, padding: '1px 4px', border: `1px solid ${C.border}`, borderRadius: 2 }}>NO 3D</span>}
                         </div>
                         <div className="mono" style={{ textAlign: 'right', fontSize: 12 }}>{fmt(li.qty, li.qty < 10 ? 1 : 0)}</div>
                         <div className="mono" style={{ fontSize: 11, color: C.textDim }}>{li.unit}</div>
-                        <input className="np" type="number" value={w} onClick={e => e.stopPropagation()}
-                          onChange={e => setWaste(prev => ({ ...prev, [li.key]: parseFloat(e.target.value) || 0 }))} style={{ textAlign: 'right' }} />
-                        <input className="np" type="number" value={p} step="0.01" onClick={e => e.stopPropagation()}
-                          onChange={e => setPrices(prev => ({ ...prev, [li.key]: parseFloat(e.target.value) || 0 }))} style={{ textAlign: 'right' }} />
+                        {!isMobile && <input className="np" type="number" value={w} onClick={e => e.stopPropagation()}
+                          onChange={e => setWaste(prev => ({ ...prev, [li.key]: parseFloat(e.target.value) || 0 }))} style={{ textAlign: 'right' }} />}
+                        {!isMobile && <input className="np" type="number" value={p} step="0.01" onClick={e => e.stopPropagation()}
+                          onChange={e => setPrices(prev => ({ ...prev, [li.key]: parseFloat(e.target.value) || 0 }))} style={{ textAlign: 'right' }} />}
                         <div className="mono" style={{ textAlign: 'right', fontSize: 12, color: ext > 0 ? C.text : C.textMute }}>{ext > 0 ? fmtMoney(ext) : '—'}</div>
                       </div>
                     );
