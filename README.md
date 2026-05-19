@@ -1,6 +1,3 @@
-Here’s a cleaner, more professional README you can paste directly into `README.md`. I based it on the live positioning from `bidlevel.xyz`, which describes Bid Level as a browser-based IFC takeoff tool with click-to-verify, revision diff, bid-ready exports, CSI grouping, and WebGL rendering. ([Bid Level][1])
-
-````md
 # Bid Level
 
 **IFC takeoff in your browser. No Revit. No Navisworks. No install.**
@@ -291,7 +288,7 @@ Adjust environment variables as the backend, waitlist, auth, and storage workflo
 ## Contact
 
 Website: [https://bidlevel.xyz](https://bidlevel.xyz)
-Email: [hello@bidlevel.app](mailto:hello@bidlevel.app)
+Email: [hello@bidlevel.app](mailto:hello@bidlevel.xyz)
 
 ---
 
@@ -302,9 +299,3 @@ Bid Level is currently in early product development / beta positioning.
 The goal is to validate demand with estimators and contractors, improve the IFC takeoff workflow, and build toward a practical browser-based estimating tool for construction teams.
 
 ```
-
-The current GitHub README is still the default Next.js boilerplate, so replacing it with this will make the repo look much more like a real product instead of a starter app.
-::contentReference[oaicite:1]{index=1}
-```
-
-[1]: https://bidlevel.xyz/ "Bid Level — IFC takeoff in your browser"
