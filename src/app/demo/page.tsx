@@ -313,6 +313,11 @@ export default function DemoPage() {
     }, 280);
   }, []);
 
+  // Auto-start on mount so visitors hit the 3D model without clicking anything
+  useEffect(() => {
+    startParse();
+  }, [startParse]);
+
   useEffect(() => {
     if (phase !== 'ready' || !canvasRef.current) return;
     const canvas = canvasRef.current;
