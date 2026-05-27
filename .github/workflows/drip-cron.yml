@@ -1,0 +1,32 @@
+# Drip email sequence — runs daily at 09:00 UTC
+# Calls the /api/cron/drip endpoint which sends Day-3 and Day-7 nurture emails.
+#
+# Setup (one-time):
+#   1. Go to GitHub → your repo → Settings → Secrets → Actions
+#   2. Add two secrets:
+#      - CRON_SECRET   →  bl_cron_s3cr3t_2026
+#      - PRODUCTION_URL → https://bidlevel.xyz   (no trailing slash)
+
+name: Drip email cron
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 09:00 UTC every day
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+jobs:
+  send-drip-emails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger drip endpoint
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.PRODUCTION_URL }}/api/cron/drip")
+          echo "Response status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Drip endpoint returned $STATUS — failing the job"
+            exit 1
+          fi
