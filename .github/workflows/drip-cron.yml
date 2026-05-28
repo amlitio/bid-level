@@ -9,10 +9,6 @@
 
 name: Drip email cron
 
-on:
-  schedule:
-    - cron: '0 9 * * *'   # 09:00 UTC every day
-  workflow_dispatch:        # allow manual trigger from GitHub UI
 
 jobs:
   send-drip-emails:
