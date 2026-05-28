@@ -6,9 +6,8 @@ import { Resend } from 'resend';
 // Vercel automatically sets Authorization: Bearer <CRON_SECRET> on cron calls.
 // The same secret must be set in your Vercel project env vars.
 
-const FROM     = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
-const REPLY_TO = 'hello@bidlevel.xyz';
-
+// ─── GET /api/cron/drip ───────────────────────────────────────────────────────
+// Clients created inside the handler so env vars are available at runtime.
 export async function GET(req: NextRequest) {
   // ── auth ────────────────────────────────────────────────────────────────────
   const auth = req.headers.get('authorization');
@@ -20,7 +19,9 @@ export async function GET(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend   = new Resend(process.env.RESEND_API_KEY);
+  const FROM     = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
+  const REPLY_TO = 'hello@bidlevel.xyz';
 
   const now   = new Date();
   const stats = { day3: 0, day7: 0, errors: 0 };

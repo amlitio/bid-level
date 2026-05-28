@@ -2,20 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
-// ─── clients ──────────────────────────────────────────────────────────────────
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Sender — set RESEND_FROM_EMAIL once your domain is verified in Resend.
-// Falls back to Resend's shared sandbox address while you're testing.
-const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
-const REPLY_TO = 'hello@bidlevel.xyz';
-
 // ─── POST /api/subscribe ───────────────────────────────────────────────────────
+// Clients created inside the handler so env vars are available at runtime,
+// not during Next.js's static-analysis build phase.
 export async function POST(req: NextRequest) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const FROM     = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
+  const REPLY_TO = 'hello@bidlevel.xyz';
+
   let body: Record<string, string>;
   try {
     body = await req.json();
